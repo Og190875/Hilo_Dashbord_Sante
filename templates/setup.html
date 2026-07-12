@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hilo {{ version }} — Configuration</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:#f0f4f8;color:#1e293b;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;padding:24px}
+
+.card{background:#fff;border-radius:16px;width:100%;max-width:560px;
+  box-shadow:0 4px 24px rgba(0,0,0,.10);overflow:hidden}
+
+.card-header{background:linear-gradient(135deg,#1e3a5f,#2563eb);
+  padding:28px 32px;text-align:center}
+.card-header h1{font-family:'Playfair Display',serif;color:#fff;font-size:1.6rem}
+.card-header p{color:rgba(255,255,255,.72);font-size:.85rem;margin-top:6px}
+
+.card-body{padding:32px}
+
+/* Steps */
+.step{display:none}
+.step.active{display:block}
+.step-indicator{display:flex;gap:8px;justify-content:center;margin-bottom:28px}
+.step-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}
+.step-dot.active{background:#2563eb}
+.step-dot.done{background:#16a34a}
+
+.step-title{font-size:1rem;font-weight:700;color:#1e3a5f;margin-bottom:20px;
+  padding-bottom:10px;border-bottom:2px solid #e2e8f0}
+
+/* Form */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-row.single{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:.78rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
+.form-group input,.form-group select{padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;
+  font-family:'Outfit',sans-serif;font-size:.9rem;color:#1e293b;background:#f8fafc;
+  transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:#2563eb;background:#fff}
+
+/* Sexe toggle */
+.sexe-row{display:flex;gap:12px}
+.sexe-btn{flex:1;padding:12px;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;
+  text-align:center;font-size:1.4rem;transition:all .2s;background:#f8fafc;user-select:none}
+.sexe-btn:hover{border-color:#93c5fd;background:#eff6ff}
+.sexe-btn.selected{border-color:#2563eb;background:#eff6ff}
+.sexe-label{font-size:.75rem;font-weight:600;color:#64748b;margin-top:4px}
+
+/* Cibles */
+.cibles-row{display:flex;gap:16px;align-items:center}
+.cible-group{flex:1;text-align:center}
+.cible-group label{font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:.04em}
+.cible-group input{width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:8px;
+  font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:700;color:#1e3a5f;
+  text-align:center;background:#f8fafc}
+.cible-group input:focus{outline:none;border-color:#2563eb;background:#fff}
+.cible-sep{font-size:1.4rem;color:#cbd5e1;font-weight:300}
+.cible-unit{font-size:.75rem;color:#94a3b8;text-align:center;margin-top:4px}
+
+/* Dossier */
+.folder-row{display:flex;gap:10px;align-items:center}
+.folder-input{flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;
+  font-family:'Outfit',sans-serif;font-size:.85rem;color:#475569;background:#f8fafc}
+.folder-input:focus{outline:none;border-color:#2563eb}
+
+/* CSV import */
+.csv-zone{border:2px dashed #cbd5e1;border-radius:10px;padding:20px;text-align:center;
+  cursor:pointer;transition:all .2s;background:#fafbfc;margin-top:12px}
+.csv-zone:hover{border-color:#2563eb;background:#eff6ff}
+.csv-zone.selected{border-color:#16a34a;background:#f0fdf4}
+.skip-link{font-size:.8rem;color:#94a3b8;text-align:center;margin-top:12px;cursor:pointer}
+.skip-link:hover{color:#475569}
+
+/* Boutons */
+.btn-row{display:flex;gap:12px;margin-top:24px}
+.btn{flex:1;padding:13px;border-radius:8px;border:none;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:.95rem;transition:all .2s}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-primary:hover{background:#1d4ed8}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-outline{background:#fff;color:#2563eb;border:2px solid #2563eb}
+.btn-outline:hover{background:#eff6ff}
+
+/* Résumé */
+.summary-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;
+  padding:18px 20px;margin-bottom:16px}
+.summary-row{display:flex;justify-content:space-between;padding:6px 0;
+  border-bottom:1px solid #f1f5f9;font-size:.88rem}
+.summary-row:last-child{border-bottom:none}
+.summary-key{color:#64748b;font-weight:500}
+.summary-val{color:#1e293b;font-weight:600}
+
+/* Notification */
+.notif{padding:10px 14px;border-radius:8px;font-size:.83rem;margin-top:12px;display:none}
+.notif.ok{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.notif.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-header">
+    <h1>🩺 Bienvenue dans Hilo</h1>
+    <p>{{ version }} — Configuration initiale</p>
+  </div>
+  <div class="card-body">
+
+    <!-- Indicateur étapes -->
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot1"></div>
+      <div class="step-dot" id="dot2"></div>
+      <div class="step-dot" id="dot3"></div>
+      <div class="step-dot" id="dot4"></div>
+    </div>
+
+    <!-- ── Étape 1 : Profil ── -->
+    <div class="step active" id="step1">
+      <div class="step-title">👤 Votre profil</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Prénom</label>
+          <input type="text" id="prenom" placeholder="Jean" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Nom</label>
+          <input type="text" id="nom" placeholder="Dupont" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Date de naissance</label>
+          <input type="date" id="naissance">
+        </div>
+      </div>
+      <div class="form-row single" style="margin-top:4px">
+        <div class="form-group">
+          <label>Sexe</label>
+          <div class="sexe-row">
+            <div class="sexe-btn selected" id="btnM" onclick="selectSexe('M')">
+              <span style="color:#60a5fa">♂</span><div class="sexe-label">Homme</div>
+            </div>
+            <div class="sexe-btn" id="btnF" onclick="selectSexe('F')">
+              <span style="color:#f472b6">♀</span><div class="sexe-label">Femme</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:4px">
+        <div class="form-group">
+          <label>Taille (cm) <span style="font-weight:400;color:#94a3b8">— optionnel</span></label>
+          <input type="number" id="taille" min="100" max="250" placeholder="ex : 175">
+        </div>
+        <div class="form-group">
+          <label>Poids (kg) <span style="font-weight:400;color:#94a3b8">— optionnel</span></label>
+          <input type="number" id="poids" min="30" max="300" step="0.1" placeholder="ex : 75.5">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goStep(2)">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ── Étape 2 : Cibles ── -->
+    <div class="step" id="step2">
+      <div class="step-title">🎯 Cibles tensionnelles</div>
+      <p style="font-size:.85rem;color:#64748b;margin-bottom:20px">
+        Définissez vos cibles personnalisées avec votre médecin.<br>
+        Valeurs par défaut recommandées : 130/80 mmHg.
+      </p>
+      <div class="cibles-row">
+        <div class="cible-group">
+          <label>💉 Systolique</label>
+          <input type="number" id="cible_sys" value="130" min="80" max="200">
+          <div class="cible-unit">mmHg</div>
+        </div>
+        <div class="cible-sep">/</div>
+        <div class="cible-group">
+          <label>💉 Diastolique</label>
+          <input type="number" id="cible_dia" value="80" min="40" max="130">
+          <div class="cible-unit">mmHg</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="goStep(1)">← Retour</button>
+        <button class="btn btn-primary" onclick="goStep(3)">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ── Étape 3 : Dossier base ── -->
+    <div class="step" id="step3">
+      <div class="step-title">📁 Emplacement de la base</div>
+      <p style="font-size:.85rem;color:#64748b;margin-bottom:16px">
+        La base <strong>hilo.db</strong> sera créée dans ce dossier.<br>
+        Choisissez un endroit mémorable (ex: Documents).
+      </p>
+      <div class="form-group">
+        <label>Chemin du dossier</label>
+        <input type="text" class="folder-input" id="db_folder"
+               placeholder="Ex: /Users/vous/Documents/Hilo"
+               style="width:100%;margin-bottom:10px">
+      </div>
+      <div style="font-size:.78rem;font-weight:600;color:#64748b;margin-bottom:6px">
+        💡 Suggestions — cliquez pour remplir :
+      </div>
+      <div id="pathSuggestions" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div id="folderNotif" class="notif"></div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="goStep(2)">← Retour</button>
+        <button class="btn btn-primary" onclick="goStep(4)">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ── Étape 4 : Import CSV (optionnel) ── -->
+    <div class="step" id="step4">
+      <div class="step-title">📥 Import hilo.csv (optionnel)</div>
+      <p style="font-size:.85rem;color:#64748b;margin-bottom:8px">
+        Vous avez un fichier <strong>hilo.csv</strong> existant ?<br>
+        Importez-le maintenant pour conserver vos données.
+      </p>
+      <div class="csv-zone" id="csvZone" onclick="document.getElementById('csvPicker').click()">
+        <div style="font-size:2rem">📄</div>
+        <div style="font-size:.88rem;color:#475569;margin-top:6px">
+          Cliquez pour sélectionner votre hilo.csv
+        </div>
+        <div id="csvName" style="font-size:.8rem;color:#16a34a;margin-top:4px"></div>
+      </div>
+      <input type="file" id="csvPicker" accept=".csv" style="display:none"
+             onchange="onCsvPicked(event)">
+      <div id="csvNotif" class="notif"></div>
+      <div class="skip-link" onclick="finalize(true)">
+        ⟶ Passer cette étape, démarrer avec une base vide
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="goStep(3)">← Retour</button>
+        <button class="btn btn-primary" id="btnFinalize" onclick="finalize(false)"
+                disabled>Importer &amp; Démarrer</button>
+      </div>
+    </div>
+
+    <!-- ── Étape 5 : Résumé / Chargement ── -->
+    <div class="step" id="step5">
+      <div class="step-title">✅ Configuration terminée !</div>
+      <div class="summary-card" id="summaryCard"></div>
+      <p style="font-size:.85rem;color:#64748b;text-align:center">
+        Redirection vers Hilo…
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let sexeSelected = 'M';
+let csvContent   = null;
+
+// ── Navigation étapes ─────────────────────────────────────────────────────────
+// Appel init suggestions au premier affichage step3
+let step3Initialized = false;
+
+function goStep(n) {
+  if (n === 3 && !step3Initialized) {
+    step3Initialized = true;
+    setTimeout(initPathSuggestions, 50);
+  }
+  if (n === 2 && !validateStep1()) return;
+  if (n === 3 && !validateStep2()) return;
+  if (n === 4 && !validateStep3()) return;
+
+  document.querySelectorAll('.step').forEach((s,i) => {
+    s.classList.toggle('active', i === n-1);
+  });
+  document.querySelectorAll('.step-dot').forEach((d,i) => {
+    d.classList.toggle('active', i === n-1);
+    d.classList.toggle('done', i < n-1);
+  });
+}
+
+function validateStep1() {
+  if (!document.getElementById('prenom').value.trim()) {
+    alert('Veuillez entrer votre prénom.'); return false;
+  }
+  if (!document.getElementById('naissance').value) {
+    alert('Veuillez entrer votre date de naissance.'); return false;
+  }
+  return true;
+}
+function validateStep2() {
+  const s = parseInt(document.getElementById('cible_sys').value);
+  const d = parseInt(document.getElementById('cible_dia').value);
+  if (s < 80 || s > 200 || d < 40 || d > 130) {
+    alert('Valeurs de cible hors limites.'); return false;
+  }
+  return true;
+}
+function validateStep3() {
+  if (!document.getElementById('db_folder').value.trim()) {
+    showNotif('folderNotif', 'Veuillez choisir un dossier.', 'err'); return false;
+  }
+  return true;
+}
+
+// ── Sexe ─────────────────────────────────────────────────────────────────────
+function selectSexe(s) {
+  sexeSelected = s;
+  document.getElementById('btnM').classList.toggle('selected', s === 'M');
+  document.getElementById('btnF').classList.toggle('selected', s === 'F');
+}
+
+// ── Dossier — suggestions de chemins ─────────────────────────────────────────
+function initPathSuggestions() {
+  // Demander au serveur le home directory
+  fetch('/api/suggest-paths').then(r => r.json()).then(d => {
+    if (!d.suggestions) return;
+    const box = document.getElementById('pathSuggestions');
+    box.innerHTML = d.suggestions.map(p => `
+      <div onclick="selectPath('${p.path}')"
+           style="padding:8px 12px;background:#f8fafc;border:1.5px solid #e2e8f0;
+                  border-radius:7px;cursor:pointer;font-size:.83rem;color:#1e293b;
+                  transition:all .2s"
+           onmouseover="this.style.borderColor='#2563eb';this.style.background='#eff6ff'"
+           onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#f8fafc'">
+        📁 <strong>${p.label}</strong>
+        <span style="color:#94a3b8;margin-left:6px">${p.path}</span>
+      </div>`).join('');
+  }).catch(() => {});
+}
+
+function selectPath(path) {
+  document.getElementById('db_folder').value = path;
+  showNotif('folderNotif', '✓ Chemin sélectionné — vous pouvez le modifier si besoin.', 'ok');
+}
+
+function showNotif(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className   = 'notif ' + type;
+  el.style.display = 'block';
+}
+
+// ── CSV ───────────────────────────────────────────────────────────────────────
+function onCsvPicked(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    csvContent = ev.target.result;
+    document.getElementById('csvName').textContent = '✓ ' + file.name;
+    document.getElementById('csvZone').classList.add('selected');
+    document.getElementById('btnFinalize').disabled = false;
+  };
+  reader.readAsText(file);
+}
+
+// ── Finalisation ──────────────────────────────────────────────────────────────
+async function finalize(skipCsv) {
+  const prenom    = document.getElementById('prenom').value.trim();
+  const nom       = document.getElementById('nom').value.trim();
+  const naissance = document.getElementById('naissance').value;
+  const cible_sys = document.getElementById('cible_sys').value;
+  const cible_dia = document.getElementById('cible_dia').value;
+  const db_folder = document.getElementById('db_folder').value.trim();
+  const taille    = document.getElementById('taille').value || null;
+  const poids     = document.getElementById('poids').value  || null;
+
+  // 1. Créer la base + profil
+  try {
+    const r = await fetch('/api/setup', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({prenom, nom, naissance,
+        sexe: sexeSelected, cible_sys, cible_dia, db_folder, taille, poids})
+    });
+    const d = await r.json();
+    if (!d.ok) { alert('Erreur : ' + d.error); return; }
+
+    // 1b. Logger le poids initial si fourni
+    if (poids) {
+      try {
+        await fetch('/api/poids', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({poids: parseFloat(poids), note: 'Poids initial setup'})
+        });
+      } catch(e) { console.warn('Poids log:', e); }
+    }
+
+    // 2. Import CSV si demandé
+    let csvResult = null;
+    if (!skipCsv && csvContent) {
+      const r2 = await fetch('/api/import-csv', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({content: csvContent})
+      });
+      csvResult = await r2.json();
+    }
+
+    // 3. Résumé
+    goStep(5);
+    const naiss = new Date(naissance);
+    const age   = Math.floor((Date.now() - naiss) / (365.25*24*3600*1000));
+    let html = `
+      <div class="summary-row"><span class="summary-key">Profil</span>
+        <span class="summary-val">${prenom} ${nom}  ·  ${sexeSelected==='M'?'<span style="color:#60a5fa">♂</span>':'<span style="color:#f472b6">♀</span>'}  ·  ${age} ans</span></div>
+      <div class="summary-row"><span class="summary-key">Cibles</span>
+        <span class="summary-val">${cible_sys} / ${cible_dia} mmHg</span></div>
+      <div class="summary-row"><span class="summary-key">Base</span>
+        <span class="summary-val">${d.db_path}</span></div>
+    `;
+    if (csvResult && !csvResult.error) {
+      html += `<div class="summary-row"><span class="summary-key">Import CSV</span>
+        <span class="summary-val">${csvResult.added} mesures importées</span></div>`;
+    }
+    document.getElementById('summaryCard').innerHTML = html;
+
+    // Redirection automatique
+    setTimeout(() => { window.location.href = '/'; }, 2000);
+
+  } catch(e) {
+    alert('Erreur réseau : ' + e.message);
+  }
+}
+</script>
+</body>
+</html>

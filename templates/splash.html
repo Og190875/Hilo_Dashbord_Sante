@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <title>Dashboard Santé — Démarrage</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;600&family=DM+Mono:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #1e3a5f;
+      --blue:   #2563eb;
+      --teal:   #0891b2;
+      --light:  #f0f6ff;
+      --muted:  #64748b;
+      --white:  #ffffff;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Fond animé */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 80%, rgba(8,145,178,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 20%, rgba(37,99,235,0.12) 0%, transparent 60%);
+      animation: pulse 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { opacity: 0.6; }
+      to   { opacity: 1.0; }
+    }
+
+    .card {
+      position: relative;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 24px;
+      padding: 52px 64px;
+      text-align: center;
+      backdrop-filter: blur(20px);
+      box-shadow:
+        0 32px 80px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      min-width: 380px;
+      animation: fadeIn 0.5s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .logo-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--teal), var(--blue));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 8px 24px rgba(8,145,178,0.4);
+    }
+
+    .logo-text {
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-text span {
+      color: var(--teal);
+    }
+
+    /* Barre de progression */
+    .progress-wrap {
+      margin: 0 auto 24px;
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--teal), var(--blue));
+      border-radius: 2px;
+      animation: indeterminate 1.4s ease-in-out infinite;
+      transform-origin: left;
+    }
+
+    @keyframes indeterminate {
+      0%   { width: 0%;   margin-left: 0%; }
+      50%  { width: 60%;  margin-left: 20%; }
+      100% { width: 0%;   margin-left: 100%; }
+    }
+
+    /* Status */
+    .status {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.04em;
+      min-height: 1.4em;
+      transition: opacity 0.3s;
+    }
+
+    /* Points animés */
+    .dots::after {
+      content: '';
+      animation: dots 1.4s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0%   { content: ''; }
+      25%  { content: '.'; }
+      50%  { content: '..'; }
+      75%  { content: '...'; }
+      100% { content: ''; }
+    }
+
+    /* Tagline */
+    .tagline {
+      margin-top: 32px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* État OK */
+    .card.ready .progress-bar {
+      animation: none;
+      width: 100%;
+      background: #22c55e;
+      transition: width 0.3s ease;
+    }
+    .card.ready .status {
+      color: #86efac;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="card">
+    <div class="logo">
+      <div class="logo-icon">🩺</div>
+      <div class="logo-text">Dashboard <span>Santé</span></div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar" id="bar"></div>
+    </div>
+
+    <div class="status" id="status">
+      <span class="dots">Démarrage du serveur</span>
+    </div>
+
+    <div class="tagline">Dashboard Santé Personnel</div>
+  </div>
+
+  <script>
+    const PORT    = 5050;
+    const TARGET  = `http://127.0.0.1:${PORT}`;
+    const status  = document.getElementById('status');
+    const card    = document.getElementById('card');
+    let   attempt = 0;
+
+    async function checkServer() {
+      attempt++;
+      try {
+        const r = await fetch(TARGET, { mode: 'no-cors', cache: 'no-store' });
+        // Serveur répond → redirection
+        status.innerHTML = '✓ Prêt — redirection<span class="dots"></span>';
+        card.classList.add('ready');
+        setTimeout(() => { window.location.href = TARGET; }, 600);
+      } catch (e) {
+        // Pas encore prêt
+        if (attempt > 60) {
+          status.textContent = '⚠ Délai dépassé — vérifiez que Hilo est bien lancé';
+          return;
+        }
+        status.innerHTML = `<span class="dots">Démarrage du serveur</span>`;
+        setTimeout(checkServer, 500);
+      }
+    }
+
+    // Démarrer les vérifications après 300ms
+    setTimeout(checkServer, 300);
+  </script>
+
+</body>
+</html>
