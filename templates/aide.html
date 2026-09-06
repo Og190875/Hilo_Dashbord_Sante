@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aide — Hilo {{ version }}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: .95rem;
+      color: #1e293b;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .aide-header {
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      color: #fff;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+    .aide-header a.back {
+      color: rgba(255,255,255,.8);
+      text-decoration: none;
+      font-size: .88rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 20px;
+      transition: background .15s;
+    }
+    .aide-header a.back:hover { background: rgba(255,255,255,.15); }
+    .aide-header h1 { font-size: 1.1rem; font-weight: 700; flex: 1; }
+    .aide-header .version-badge {
+      font-size: .75rem;
+      color: rgba(255,255,255,.5);
+      font-weight: 400;
+    }
+
+    /* ── Layout ── */
+    .aide-layout {
+      display: flex;
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 16px;
+      gap: 32px;
+    }
+
+    /* ── Sidebar ── */
+    .aide-sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      padding: 28px 0;
+    }
+    .aide-sidebar nav {
+      position: sticky;
+      top: 72px;
+    }
+    .aide-sidebar .nav-title {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      padding: 0 8px;
+    }
+    .aide-sidebar a {
+      display: block;
+      padding: 7px 10px;
+      border-radius: 8px;
+      color: #475569;
+      text-decoration: none;
+      font-size: .87rem;
+      transition: background .12s, color .12s;
+      margin-bottom: 2px;
+    }
+    .aide-sidebar a:hover { background: #e2e8f0; color: #1e293b; }
+    .aide-sidebar a.active { background: #dbeafe; color: #1e40af; font-weight: 600; }
+
+    /* ── Content ── */
+    .aide-content {
+      flex: 1;
+      padding: 32px 0 60px;
+      min-width: 0;
+    }
+
+    /* ── Titres ── */
+    .aide-content h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin: 48px 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+      scroll-margin-top: 80px;
+    }
+    .aide-content h1:first-child { margin-top: 0; }
+    .aide-content h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #334155;
+      margin: 28px 0 12px;
+      scroll-margin-top: 80px;
+    }
+    .aide-content h3 {
+      font-size: .95rem;
+      font-weight: 600;
+      color: #475569;
+      margin: 20px 0 8px;
+    }
+
+    /* ── Texte ── */
+    .aide-content p { margin-bottom: 12px; line-height: 1.7; color: #374151; }
+    .aide-content ul, .aide-content ol { margin: 0 0 14px 22px; }
+    .aide-content li { margin-bottom: 6px; line-height: 1.65; }
+    .aide-content strong { color: #1e293b; }
+    .aide-content em { color: #64748b; }
+
+    /* ── Tables ── */
+    .aide-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 20px;
+      font-size: .88rem;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.07);
+    }
+    .aide-content th {
+      background: #1e40af;
+      color: #fff;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: .84rem;
+    }
+    .aide-content td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: top;
+    }
+    .aide-content tr:last-child td { border-bottom: none; }
+    .aide-content tr:nth-child(even) td { background: #f8fafc; }
+
+    /* Tables de capture (images) */
+    .aide-content table.capture-table {
+      background: transparent;
+      box-shadow: none;
+      border: none;
+    }
+    .aide-content table.capture-table th,
+    .aide-content table.capture-table td {
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+
+    /* ── Images ── */
+    .aide-content img {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.1);
+      margin: 10px 0 16px;
+      display: block;
+    }
+
+    /* ── Info-boxes ── */
+    .info-box {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 14px 0;
+      font-size: .9rem;
+      line-height: 1.6;
+    }
+    .info-tip    { background: #eff6ff; border-left: 4px solid #3b82f6; color: #1e40af; }
+    .info-medical{ background: #f0fdf4; border-left: 4px solid #22c55e; color: #166534; }
+    .info-warning{ background: #fff7ed; border-left: 4px solid #f97316; color: #9a3412; }
+
+    /* ── Sommaire ── */
+    #sommaire + p,
+    #sommaire ~ p:nth-of-type(-n+9) {
+      font-size: .92rem;
+      color: #475569;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .aide-sidebar { display: none; }
+      .aide-layout  { padding: 0 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="aide-header">
+    <a class="back" href="#" onclick="history.back();return false;">← Retour à Hilo</a>
+    <h1>🩺 Guide d'utilisation Hilo</h1>
+    <span class="version-badge">{{ version }}</span>
+  </div>
+
+  <div class="aide-layout">
+
+    <!-- Sidebar navigation -->
+    <aside class="aide-sidebar">
+      <nav>
+        <div class="nav-title">Sommaire</div>
+        <a href="#sommaire">📋 Sommaire</a>
+        <a href="#introduction-à-hilo">1. Introduction</a>
+        <a href="#première-configuration-setup">2. Configuration</a>
+        <a href="#navigation-principale">3. Navigation</a>
+        <a href="#page-accueil">4. Accueil</a>
+        <a href="#dashboard">5. Dashboard</a>
+        <a href="#automesures">6. Automesures</a>
+        <a href="#import-pdf">7. Import PDF</a>
+        <a href="#paramètres">8. Paramètres</a>
+        <a href="#questions-fréquentes">9. FAQ</a>
+      </nav>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="aide-content">
+<h1 id="sommaire">Sommaire</h1>
+<p>1. Introduction à Hilo</p>
+<p>2. Première configuration (Setup)</p>
+<p>3. Navigation principale</p>
+<p>4. Page Accueil</p>
+<p>5. Dashboard</p>
+<p>6. Automesures</p>
+<p>7. Import PDF</p>
+<p>8. Paramètres</p>
+<p>9. Questions fréquentes</p>
+<h1 id="introduction-à-hilo">1. Introduction à Hilo</h1>
+<p>Hilo est une application personnelle de suivi de la tension
+artérielle. Elle vous permet d'importer vos relevés depuis des fichiers
+PDF, de les analyser sous forme de graphiques, de suivre vos traitements
+et de générer des rapports pour vos médecins.</p>
+<h2 id="ce-que-hilo-vous-permet-de-faire">Ce que Hilo vous permet de
+faire</h2>
+<ul>
+<li><p>Importer automatiquement vos mesures depuis des PDFs de
+tensiomètre</p></li>
+<li><p>Visualiser vos tendances systolique, diastolique et fréquence
+cardiaque</p></li>
+<li><p>Suivre vos objectifs tensionnels fixés avec votre
+médecin</p></li>
+<li><p>Gérer vos traitements médicamenteux</p></li>
+<li><p>Réaliser des protocoles d'automesures (règle des 3 × 3)</p></li>
+<li><p>Exporter et imprimer des rapports détaillés</p></li>
+<li><p>Suivre l'évolution de votre poids</p></li>
+</ul>
+<div class="info-box info-tip">💡 Hilo fonctionne entièrement en local sur votre ordinateur. Vos
+données ne sont jamais envoyées sur Internet. (sauf transfert FTP)</div>
+<h1 id="première-configuration-setup">2. Première configuration
+(Setup)</h1>
+<p>Au premier lancement de Hilo, un assistant de configuration en 4
+étapes vous guide pour créer votre profil.</p>
+<table class="capture-table">
+<colgroup>
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><p><img src="/static/aide/image1.png"
+style="width:6.68889in;height:7.93889in" /></p>
+<p><img src="/static/aide/image2.png"
+style="width:6.68889in;height:5.90208in" /></p>
+<p><img src="/static/aide/image3.png"
+style="width:6.68889in;height:7.82292in" /></p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<h2 id="étape-1-votre-profil">Étape 1 — Votre profil</h2>
+<table>
+<colgroup>
+<col />
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Champ</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Obligatoire</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Prénom</td>
+<td>Votre prénom, affiché dans les salutations</td>
+<td>Oui</td>
+</tr>
+<tr class="even">
+<td>Nom</td>
+<td>Votre nom de famille</td>
+<td>Non</td>
+</tr>
+<tr class="odd">
+<td>Date de naissance</td>
+<td>Utilisée pour calculer votre âge et adapter les seuils</td>
+<td>Oui</td>
+</tr>
+<tr class="even">
+<td>Sexe</td>
+<td>Homme ou Femme — cliquez sur le bouton correspondant</td>
+<td>Oui</td>
+</tr>
+<tr class="odd">
+<td>Taille (cm)</td>
+<td>Permet de calculer l'IMC avec le poids</td>
+<td>Non</td>
+</tr>
+<tr class="even">
+<td>Poids (kg)</td>
+<td>Poids initial, enregistré dans l'historique poids</td>
+<td>Non</td>
+</tr>
+</tbody>
+</table>
+<h2 id="étape-2-cibles-tensionnelles">Étape 2 — Cibles
+tensionnelles</h2>
+<p>Saisissez ici les objectifs tensionnels recommandés par votre
+médecin. Ces valeurs servent de référence dans tous les graphiques et
+rapports.</p>
+<table>
+<colgroup>
+<col />
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Cible</strong></th>
+<th><strong>Valeur par défaut</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Systolique (mmHg)</td>
+<td>135</td>
+<td>Pression maximale lors de la contraction du cœur</td>
+</tr>
+<tr class="even">
+<td>Diastolique (mmHg)</td>
+<td>85</td>
+<td>Pression minimale lors du relâchement du cœur</td>
+</tr>
+</tbody>
+</table>
+<div class="info-box info-medical">⚕️ Ces valeurs sont indicatives. Demandez toujours conseil à votre
+médecin pour définir vos cibles personnelles.</div>
+<h2 id="étape-3-dossier-de-données">Étape 3 — Dossier de données</h2>
+<p>Hilo stocke toutes vos données dans un fichier local (hilo.db).
+Choisissez un dossier sur votre ordinateur où ce fichier sera créé. Des
+suggestions de dossiers sont proposées automatiquement.</p>
+<ul>
+<li><p><strong>Bouton Parcourir :</strong> ouvre le sélecteur de dossier
+de votre système</p></li>
+<li><p><strong>Suggestions :</strong> cliquez sur l'un des chemins
+proposés pour le sélectionner directement</p></li>
+</ul>
+<h2 id="étape-4-import-initial-optionnel">Étape 4 — Import initial
+(optionnel)</h2>
+<p>Si vous possédez déjà un fichier hilo.csv exporté depuis une version
+précédente, vous pouvez l'importer ici pour récupérer vos données
+existantes.</p>
+<ul>
+<li><p><strong>Bouton Choisir le fichier :</strong> sélectionnez votre
+hilo.csv</p></li>
+<li><p><strong>Bouton Passer :</strong> ignorez cette étape si vous
+n'avez pas de fichier à importer</p></li>
+</ul>
+<h1 id="navigation-principale">3. Navigation principale</h1>
+<p>La barre de navigation en haut de l'écran vous permet d'accéder aux
+différentes sections de l'application.</p>
+<table class="capture-table">
+<colgroup>
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><p><img src="/static/aide/image4.png"
+style="width:6.68889in;height:0.63542in" /></p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Onglet</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>🏠 Accueil</td>
+<td>Vue synthétique : résumé 30 jours, donuts, sparklines et suivi
+poids</td>
+</tr>
+<tr class="even">
+<td>🖥️ Dashboard</td>
+<td>Analyse complète avec graphiques interactifs, filtres et
+classification ESH</td>
+</tr>
+<tr class="odd">
+<td>📋 Automesures</td>
+<td>Gestion des protocoles d'automesures (règle 3×3)</td>
+</tr>
+<tr class="even">
+<td>📄 Import PDF</td>
+<td>Importation de fichiers PDF de tensiomètre</td>
+</tr>
+<tr class="odd">
+<td>⚙️ Paramètres</td>
+<td>Profil, cibles, traitements, base de données, export</td>
+</tr>
+</tbody>
+</table>
+<h1 id="page-accueil">4. Page Accueil</h1>
+<p>La page d'accueil offre un résumé visuel rapide de votre état
+tensionnel sur les 30 derniers jours.</p>
+<table class="capture-table">
+<colgroup>
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><p><em>Bloc bonjour, donuts systolique et diastolique, sparklines,
+courbe poids</em></p>
+<p><img src="/static/aide/image5.png"
+style="width:6.68889in;height:3.63889in" /></p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<h2 id="bloc-de-bienvenue">Bloc de bienvenue</h2>
+<p>En haut de page, un message de salutation personnalisé affiche un
+résumé rapide :</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Élément</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bonjour / Bonsoir [Prénom]</td>
+<td>Message adapté à l'heure de la journée</td>
+</tr>
+<tr class="even">
+<td>Période couverte</td>
+<td>Date de la première et dernière mesure importée</td>
+</tr>
+<tr class="odd">
+<td>Nombre de mesures total</td>
+<td>Total cumulé de toutes vos mesures</td>
+</tr>
+<tr class="even">
+<td>Dernier import</td>
+<td>Nom du dernier fichier PDF importé et sa date</td>
+</tr>
+<tr class="odd">
+<td>Compteurs rapides</td>
+<td>Mesures 30j · Sys moy · Dia moy · FC moy sur les 30 derniers
+jours</td>
+</tr>
+</tbody>
+</table>
+<h2 id="alerte-poids">Alerte poids</h2>
+<p>Si votre poids n'a pas été mis à jour depuis plus de 30 jours (ou n'a
+jamais été renseigné), une bannière orange apparaît :</p>
+<table>
+<colgroup>
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th>⚖️ Poids non mis à jour depuis X jours — Mettez à jour votre poids
+dans Paramètres → Profil &amp; Cibles</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<p><strong>Bouton ✕ :</strong> ferme l'alerte pour la session en
+cours</p>
+<h2 id="donuts-systolique-et-diastolique">Donuts Systolique et
+Diastolique</h2>
+<p>Deux graphiques circulaires affichent la répartition de vos mesures
+sur 30 jours selon la classification ESH (European Society of
+Hypertension) :</p>
+<table>
+<colgroup>
+<col />
+<col />
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Couleur</strong></th>
+<th><strong>Classification</strong></th>
+<th><strong>Systolique</strong></th>
+<th><strong>Diastolique</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>🟢 Vert foncé</td>
+<td>Optimale</td>
+<td>&lt; 120 mmHg</td>
+<td>&lt; 80 mmHg</td>
+</tr>
+<tr class="even">
+<td>🟢 Vert clair</td>
+<td>Normale</td>
+<td>120–129 mmHg</td>
+<td>80–84 mmHg</td>
+</tr>
+<tr class="odd">
+<td>🟡 Jaune</td>
+<td>Élevée</td>
+<td>130–139 mmHg</td>
+<td>85–89 mmHg</td>
+</tr>
+<tr class="even">
+<td>🟠 Orange</td>
+<td>HTA Stade 1</td>
+<td>140–159 mmHg</td>
+<td>90–99 mmHg</td>
+</tr>
+<tr class="odd">
+<td>🔴 Rouge</td>
+<td>HTA Stade 2</td>
+<td>160–179 mmHg</td>
+<td>100–109 mmHg</td>
+</tr>
+<tr class="even">
+<td>🔴 Rouge foncé</td>
+<td>HTA Stade 3</td>
+<td>≥ 180 mmHg</td>
+<td>≥ 110 mmHg</td>
+</tr>
+</tbody>
+</table>
+<p>Au centre du donut : la valeur moyenne. À droite : la légende avec le
+pourcentage de chaque catégorie.</p>
+<h2 id="sparklines-de-tendance-30-jours">Sparklines de tendance 30
+jours</h2>
+<p>Sous chaque donut, une mini-courbe montre l'évolution de vos mesures
+sur 30 jours. La couleur de la courbe reflète la tendance détectée :</p>
+<table>
+<colgroup>
+<col />
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Couleur</strong></th>
+<th><strong>Tendance</strong></th>
+<th><strong>Signification</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>🔴 Rouge</td>
+<td>Forte hausse</td>
+<td>Augmentation rapide — consulter votre médecin</td>
+</tr>
+<tr class="even">
+<td>�� Orange</td>
+<td>Hausse</td>
+<td>Légère tendance à la hausse</td>
+</tr>
+<tr class="odd">
+<td>🟡 Jaune/doré</td>
+<td>Stable</td>
+<td>Valeurs stables — bonne maîtrise</td>
+</tr>
+<tr class="even">
+<td>🟢 Vert</td>
+<td>Baisse</td>
+<td>Légère tendance à la baisse</td>
+</tr>
+<tr class="odd">
+<td>🔵 Bleu</td>
+<td>Forte baisse</td>
+<td>Baisse marquée — à surveiller</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Écart vs cible :</strong> affiché en rouge si au-dessus de la
+cible, en vert si en dessous</p>
+<h2 id="courbe-de-poids-12-mois">Courbe de poids — 12 mois</h2>
+<p>Si au moins 2 pesées ont été enregistrées, une courbe orange apparaît
+sous les donuts et affiche l'évolution de votre poids sur les 12
+derniers mois.</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Élément</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Valeur actuelle</td>
+<td>Dernier poids enregistré en kg</td>
+</tr>
+<tr class="even">
+<td>Delta</td>
+<td>▲ +X kg ou ▼ -X kg sur 12 mois (rouge si hausse, vert si
+baisse)</td>
+</tr>
+<tr class="odd">
+<td>Dates</td>
+<td>Première et dernière pesée sous le graphique</td>
+</tr>
+</tbody>
+</table>
+<h1 id="dashboard">5. Dashboard</h1>
+<p>Le Dashboard est le cœur analytique de Hilo. Il offre une
+visualisation complète de toutes vos mesures avec des filtres, des
+graphiques interactifs et des outils d'impression.</p>
+<table class="capture-table">
+<colgroup>
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><p><img src="/static/aide/image6.png"
+style="width:6.68889in;height:0.83333in" /></p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<h2 id="filtres-et-paramètres">Filtres et paramètres</h2>
+<p>En haut du Dashboard, une barre de contrôles permet de personnaliser
+l'analyse :</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Champ / Bouton</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Date de début / Date de fin</td>
+<td>Filtrer les mesures sur une période précise</td>
+</tr>
+<tr class="even">
+<td>Cible sys / Cible dia</td>
+<td>Ajuster les cibles pour le calcul du pourcentage dans la cible</td>
+</tr>
+<tr class="odd">
+<td>Vue (Jour / Semaine / Mois)</td>
+<td>Granularité des graphiques temporels</td>
+</tr>
+<tr class="even">
+<td>Appliquer</td>
+<td>Valider les filtres et recharger les graphiques</td>
+</tr>
+<tr class="odd">
+<td>Réinitialiser</td>
+<td>Revenir aux paramètres par défaut (toute la période)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="onglets-du-dashboard">Onglets du Dashboard</h2>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Onglet</strong></th>
+<th><strong>Contenu</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>📈 Stats &amp; Distribution</td>
+<td>Histogrammes de répartition Sys/Dia/FC + tableau statistique
+complet</td>
+</tr>
+<tr class="even">
+<td>💉 Tension</td>
+<td>Courbe temporelle Sys et Dia avec cibles</td>
+</tr>
+<tr class="odd">
+<td>🎯 Cible</td>
+<td>Pourcentage de mesures dans/hors cible dans le temps</td>
+</tr>
+<tr class="even">
+<td>📊 Classification</td>
+<td>Répartition par niveau ESH dans le temps</td>
+</tr>
+<tr class="odd">
+<td>❤️ FC</td>
+<td>Évolution de la fréquence cardiaque</td>
+</tr>
+<tr class="even">
+<td>🏆 Classement</td>
+<td>Palmarès des jours et créneaux horaires les plus favorables</td>
+</tr>
+<tr class="odd">
+<td>🗃️ Vue d'ensemble</td>
+<td>Tous les graphiques côte à côte (Temporel + Profil horaire)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="impression-du-dashboard">Impression du Dashboard</h2>
+<p><strong>Bouton 🖨️ Imprimer :</strong> ouvre un popup de configuration
+avant impression.</p>
+<p>Popup d'impression :</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Option</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Portrait / Paysage</td>
+<td>Orientation de la page imprimée</td>
+</tr>
+<tr class="even">
+<td>Graphiques à inclure</td>
+<td>Sur la Vue d'ensemble : cochez/décochez chaque graphique, réordonnez
+par glisser-déposer (⠿)</td>
+</tr>
+<tr class="odd">
+<td>Bouton Imprimer</td>
+<td>Lance l'impression avec les options sélectionnées</td>
+</tr>
+<tr class="even">
+<td>Bouton Annuler</td>
+<td>Ferme le popup sans imprimer</td>
+</tr>
+</tbody>
+</table>
+<div class="info-box info-tip">💡 Sur les autres onglets (Tension, Cible, etc.), le popup affiche
+uniquement l'orientation — le graphique de l'onglet actif est imprimé
+directement.</div>
+<h1 id="automesures">6. Automesures</h1>
+<p>La section Automesures vous permet de réaliser des protocoles de
+mesure selon la règle des 3 × 3 recommandée par les sociétés savantes :
+3 mesures matin et soir pendant 3 jours consécutifs, en dehors de toute
+prise de médicament.</p>
+<table class="capture-table">
+<colgroup>
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><p><img src="/static/aide/image7.png"
+style="width:6.68889in;height:3.56181in" /></p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<h2 id="sous-onglets">Sous-onglets</h2>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Onglet</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>📋 Protocole actif</td>
+<td>Grille de saisie des mesures du protocole en cours</td>
+</tr>
+<tr class="even">
+<td>📊 Historique</td>
+<td>Liste de tous les protocoles passés avec leurs résultats</td>
+</tr>
+<tr class="odd">
+<td>⚙️ Nouveau protocole</td>
+<td>Créer un nouveau protocole d'automesures</td>
+</tr>
+</tbody>
+</table>
+<h2 id="créer-un-nouveau-protocole">Créer un nouveau protocole</h2>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Champ</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Libellé</td>
+<td>Nom du protocole (ex : Bilan avant RDV cardio)</td>
+</tr>
+<tr class="even">
+<td>Date de début</td>
+<td>Premier jour de mesure</td>
+</tr>
+<tr class="odd">
+<td>Nombre de jours</td>
+<td>3, 5 ou 7 jours (boutons de sélection rapide)</td>
+</tr>
+<tr class="even">
+<td>Mesures par séance</td>
+<td>Nombre de mesures consécutives (2 à 5)</td>
+</tr>
+<tr class="odd">
+<td>Intervalle entre mesures</td>
+<td>Temps en minutes entre chaque mesure (1 à 10 min)</td>
+</tr>
+<tr class="even">
+<td>Seuil complétude rapport</td>
+<td>Pourcentage minimum de séances remplies pour valider le rapport</td>
+</tr>
+<tr class="odd">
+<td>Moments de mesure</td>
+<td>Cochez : Matin, Soir et/ou Nuit</td>
+</tr>
+</tbody>
+</table>
+<h2 id="saisie-des-mesures-protocole-actif">Saisie des mesures —
+Protocole actif</h2>
+<p>La grille affiche toutes les séances à réaliser. Chaque cellule
+correspond à une séance (Matin/Soir × Jour 1/2/3...).</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Élément</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cellule vide</td>
+<td>Cliquer pour ouvrir le modal de saisie</td>
+</tr>
+<tr class="even">
+<td>Cellule remplie</td>
+<td>Affiche les valeurs sys/dia/FC — cliquer pour modifier</td>
+</tr>
+<tr class="odd">
+<td>Ligne bras S</td>
+<td>Visible uniquement si un bras secondaire a été saisi</td>
+</tr>
+<tr class="even">
+<td>Barre de progression</td>
+<td>Affiche le pourcentage de séances complétées</td>
+</tr>
+<tr class="odd">
+<td>Bouton ⚙️ Réglages</td>
+<td>Modifier les paramètres du protocole en cours</td>
+</tr>
+<tr class="even">
+<td>Bouton 🏁 Clôturer</td>
+<td>Terminer le protocole et générer le rapport</td>
+</tr>
+</tbody>
+</table>
+<h2 id="modal-de-saisie-dune-séance">Modal de saisie d'une séance</h2>
+<p>En cliquant sur une cellule, un formulaire s'ouvre avec deux colonnes
+:</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Colonne</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bras prioritaire (bleu, bordure pleine)</td>
+<td>Sys / Dia / FC obligatoires</td>
+</tr>
+<tr class="even">
+<td>Bras secondaire (violet, bordure tiretée)</td>
+<td>Sys / Dia / FC optionnels — se renseigne si vous mesurez des deux
+bras</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bouton Enregistrer :</strong> sauvegarde les mesures. Si le
+bras secondaire est renseigné, il est automatiquement activé.</p>
+<h2 id="rapport-de-protocole">Rapport de protocole</h2>
+<p>Après clôture (ou consultation de l'historique), le rapport présente
+:</p>
+<ul>
+<li><p>Tableau détaillé par séance avec moyennes par moment (Matin/Soir)
+et globales</p></li>
+<li><p>Valeurs du bras secondaire affichées en italique entre
+parenthèses : ex. 135 (132)</p></li>
+<li><p>Classification ESH des moyennes</p></li>
+<li><p>Écart par rapport à vos cibles</p></li>
+<li><p>Synthèse globale avec comparaison bras principal / bras
+secondaire</p></li>
+</ul>
+<h1 id="import-pdf">7. Import PDF</h1>
+<p>La section Import PDF permet d'importer vos relevés de tension depuis
+des fichiers PDF générés par votre tensiomètre connecté.</p>
+<table class="capture-table">
+<colgroup>
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><p><img src="/static/aide/image8.png"
+style="width:6.68889in;height:3.22222in" /></p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<h2 id="importer-des-fichiers">Importer des fichiers</h2>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Élément</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Zone de dépôt</td>
+<td>Glissez-déposez un ou plusieurs PDFs directement dans la zone</td>
+</tr>
+<tr class="even">
+<td>Bouton Choisir PDF(s)</td>
+<td>Ouvre le sélecteur de fichiers de votre système</td>
+</tr>
+<tr class="odd">
+<td>Bouton Importer</td>
+<td>Lance l'extraction et l'injection des mesures en base</td>
+</tr>
+</tbody>
+</table>
+<p>Après import, un résumé s'affiche pour chaque fichier :</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Information</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mesures extraites</td>
+<td>Nombre total de lignes trouvées dans le PDF</td>
+</tr>
+<tr class="even">
+<td>Ajoutées</td>
+<td>Nouvelles mesures effectivement injectées en base</td>
+</tr>
+<tr class="odd">
+<td>Doublons</td>
+<td>Mesures déjà présentes, ignorées automatiquement</td>
+</tr>
+<tr class="even">
+<td>Erreurs</td>
+<td>Lignes non reconnues ou mal formées</td>
+</tr>
+</tbody>
+</table>
+<div class="info-box info-tip">💡 Vous pouvez importer plusieurs PDFs en une seule fois. Hilo
+élimine automatiquement les doublons — vous pouvez importer le même PDF
+plusieurs fois sans risque.</div>
+<h1 id="paramètres">8. Paramètres</h1>
+<p>La section Paramètres est organisée en 5 onglets pour une navigation
+claire.</p>
+<table class="capture-table">
+<colgroup>
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><p><img src="/static/aide/image9.png"
+style="width:6.68889in;height:0.80903in" /></p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<h2 id="profil-cibles">👤 Profil &amp; Cibles</h2>
+<h3 id="bloc-profil">Bloc Profil</h3>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Champ</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Prénom / Nom</td>
+<td>Vos informations personnelles</td>
+</tr>
+<tr class="even">
+<td>Date de naissance</td>
+<td>Permet le calcul de l'âge dans les rapports</td>
+</tr>
+<tr class="odd">
+<td>Sexe</td>
+<td>Boutons Homme / Femme</td>
+</tr>
+<tr class="even">
+<td>Taille (cm)</td>
+<td>Hauteur en centimètres</td>
+</tr>
+<tr class="odd">
+<td>Poids (kg)</td>
+<td>Poids actuel — toute modification déclenche un enregistrement dans
+l'historique poids</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bouton 💾 Enregistrer le profil :</strong> sauvegarde toutes
+les modifications. Si le poids a changé d'au moins 0,1 kg, une nouvelle
+entrée est automatiquement ajoutée à l'historique.</p>
+<h3 id="bloc-cibles-tensionnelles">Bloc Cibles tensionnelles</h3>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Champ</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Systolique (mmHg)</td>
+<td>Valeur cible pour la pression systolique</td>
+</tr>
+<tr class="even">
+<td>Diastolique (mmHg)</td>
+<td>Valeur cible pour la pression diastolique</td>
+</tr>
+<tr class="odd">
+<td>FC cible (bpm)</td>
+<td>Fréquence cardiaque cible</td>
+</tr>
+<tr class="even">
+<td>Début journée / Fin journée</td>
+<td>Plage horaire considérée comme "jour" pour l'analyse des profils
+horaires</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bouton 💾 Enregistrer les cibles :</strong> applique
+immédiatement les nouvelles cibles à tous les graphiques.</p>
+<h2 id="traitements">💊 Traitements</h2>
+<p>Gérez ici la liste de vos médicaments antihypertenseurs.</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Champ / Bouton</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Nom du médicament</td>
+<td>Ex : Amlodipine, Ramipril...</td>
+</tr>
+<tr class="even">
+<td>Dose (mg)</td>
+<td>Posologie en milligrammes</td>
+</tr>
+<tr class="odd">
+<td>Fréquence</td>
+<td>Ex : 1×/jour, 2×/jour...</td>
+</tr>
+<tr class="even">
+<td>Date de début</td>
+<td>Début de la prise de ce traitement</td>
+</tr>
+<tr class="odd">
+<td>Date de fin</td>
+<td>Laisser vide si traitement en cours</td>
+</tr>
+<tr class="even">
+<td>Notes</td>
+<td>Informations complémentaires libres</td>
+</tr>
+<tr class="odd">
+<td>Bouton ➕ Ajouter</td>
+<td>Enregistre le traitement dans la liste</td>
+</tr>
+<tr class="even">
+<td>Bouton ✏️</td>
+<td>Modifier un traitement existant</td>
+</tr>
+<tr class="odd">
+<td>Bouton 🗑️</td>
+<td>Supprimer un traitement</td>
+</tr>
+</tbody>
+</table>
+<h2 id="base-de-données">🗄️ Base de données</h2>
+<h3 id="informations">Informations</h3>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Élément</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Chemin de la base</td>
+<td>Emplacement du fichier hilo.db sur votre ordinateur</td>
+</tr>
+<tr class="even">
+<td>Nombre de mesures</td>
+<td>Total des mesures stockées</td>
+</tr>
+<tr class="odd">
+<td>Taille du fichier</td>
+<td>Espace disque occupé par la base</td>
+</tr>
+<tr class="even">
+<td>Bouton 📂 Ouvrir le dossier</td>
+<td>Ouvre le dossier contenant la base dans l'explorateur</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sauvegarde-et-restauration">Sauvegarde et restauration</h3>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Bouton</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>💾 Sauvegarder la base</td>
+<td>Crée une copie de sauvegarde horodatée du fichier hilo.db</td>
+</tr>
+<tr class="even">
+<td>📂 Restaurer une sauvegarde</td>
+<td>Remplace la base actuelle par une sauvegarde précédente</td>
+</tr>
+<tr class="odd">
+<td>📊 Vérifier l'intégrité</td>
+<td>Lance un diagnostic de la base de données</td>
+</tr>
+<tr class="even">
+<td>📥 Exporter en CSV</td>
+<td>Exporte toutes vos mesures dans un fichier CSV exploitable sous
+Excel</td>
+</tr>
+</tbody>
+</table>
+<h3 id="suivi-des-actions">Suivi des actions</h3>
+<p>Un journal chronologique liste toutes les actions effectuées :
+imports, sauvegardes, modifications de profil, etc.</p>
+<h2 id="export">📡 Export</h2>
+<p>Exportez votre Dashboard sous forme de fichier HTML autonome,
+consultable sur n'importe quel navigateur.</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Option</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Export local</td>
+<td>Enregistre le fichier hilo_dashboard_AAAA-MM-JJ.html dans le dossier
+de la base</td>
+</tr>
+<tr class="even">
+<td>Export FTP</td>
+<td>Envoie automatiquement le Dashboard sur un serveur FTP/SFTP</td>
+</tr>
+<tr class="odd">
+<td>Hôte FTP</td>
+<td>Adresse du serveur (ex : ftp.monserveur.com)</td>
+</tr>
+<tr class="even">
+<td>Port</td>
+<td>Port FTP (21 par défaut, 22 pour SFTP)</td>
+</tr>
+<tr class="odd">
+<td>Utilisateur / Mot de passe</td>
+<td>Identifiants de connexion FTP</td>
+</tr>
+<tr class="even">
+<td>Dossier distant</td>
+<td>Chemin de destination sur le serveur</td>
+</tr>
+<tr class="odd">
+<td>Bouton Tester la connexion</td>
+<td>Vérifie que les paramètres FTP sont corrects</td>
+</tr>
+<tr class="even">
+<td>Auto-export après import</td>
+<td>Active l'export FTP automatique après chaque import PDF</td>
+</tr>
+</tbody>
+</table>
+<h2 id="expert">🔬 Expert</h2>
+<p>Fonctions avancées réservées aux utilisateurs confirmés.</p>
+<h3 id="mesures-enregistrées">Mesures enregistrées</h3>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Élément</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Recherche (date/heure)</td>
+<td>Filtrer par texte, ex : "2026-01" pour janvier 2026</td>
+</tr>
+<tr class="even">
+<td>Du / Au</td>
+<td>Filtrer par plage de dates</td>
+</tr>
+<tr class="odd">
+<td>Bouton ⟳ Actualiser</td>
+<td>Recharger la liste avec les filtres appliqués</td>
+</tr>
+<tr class="even">
+<td>Bouton ✕ Effacer filtres</td>
+<td>Réinitialiser les filtres</td>
+</tr>
+<tr class="odd">
+<td>✏️ (par mesure)</td>
+<td>Modifier manuellement une mesure (sys, dia, FC)</td>
+</tr>
+<tr class="even">
+<td>🗑️ (par mesure)</td>
+<td>Supprimer définitivement une mesure</td>
+</tr>
+<tr class="odd">
+<td>Pagination</td>
+<td>Navigation entre les pages de résultats (50 mesures par page)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="extraction-brute-pdf-csv">Extraction brute PDF → CSV</h3>
+<p>Extrait les mesures d'un ou plusieurs PDFs sans les injecter en base.
+Utile pour vérifier le contenu d'un fichier avant import, ou pour
+exporter vers un autre outil.</p>
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Bouton</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Choisir PDF(s)</td>
+<td>Sélectionner un ou plusieurs fichiers PDF</td>
+</tr>
+<tr class="even">
+<td>Extraire</td>
+<td>Lance l'extraction et télécharge le CSV résultant</td>
+</tr>
+</tbody>
+</table>
+<h3 id="zone-dangereuse">Zone dangereuse</h3>
+<table>
+<colgroup>
+<col />
+<col />
+<col />
+</colgroup>
+<thead>
+<tr class="header">
+<th colspan="3">⚠️ Ces actions sont irréversibles. Pensez à sauvegarder
+votre base avant toute opération.</th>
+</tr>
+<tr class="odd">
+<th colspan="2"><strong>Bouton</strong></th>
+<th><strong>Effet</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td colspan="2">🗑️ Vider les mesures</td>
+<td>Supprime toutes les mesures mais conserve le profil, les traitements
+et les paramètres</td>
+</tr>
+<tr class="even">
+<td colspan="2">⚠️ Réinitialiser tout</td>
+<td>Supprime absolument toutes les données — remet Hilo à zéro</td>
+</tr>
+</tbody>
+</table>
+<h1 id="questions-fréquentes">9. Questions fréquentes</h1>
+<h2 id="mon-pdf-nest-pas-reconnu">Mon PDF n'est pas reconnu</h2>
+<p>Hilo supporte les PDFs générés par les tensiomètres connectés
+compatibles. Vérifiez que le fichier n'est pas protégé par un mot de
+passe et qu'il contient bien des données tabulaires de tension.</p>
+<h2 id="comment-mettre-à-jour-mon-poids">Comment mettre à jour mon poids
+?</h2>
+<p>Allez dans Paramètres → Profil &amp; Cibles, modifiez le champ Poids,
+puis cliquez sur Enregistrer. Le nouveau poids sera automatiquement
+ajouté à l'historique et la courbe de l'Accueil sera mise à jour.</p>
+<h2 id="puis-je-avoir-des-mesures-des-deux-bras">Puis-je avoir des
+mesures des deux bras ?</h2>
+<p>Oui, dans le protocole d'automesures. Le modal de saisie propose deux
+colonnes : bras principal (obligatoire) et bras secondaire (optionnel).
+Les valeurs du bras secondaire apparaissent en italique entre
+parenthèses dans le rapport.</p>
+<h2 id="comment-sauvegarder-mes-données">Comment sauvegarder mes données
+?</h2>
+<p>Dans Paramètres → Base de données, cliquez sur Sauvegarder la base.
+Une copie horodatée est créée dans le même dossier que votre base
+hilo.db. Vous pouvez également exporter toutes vos mesures en CSV.</p>
+<h2 id="mes-données-sont-elles-sécurisées">Mes données sont-elles
+sécurisées ?</h2>
+<p>Hilo fonctionne entièrement en local. Aucune donnée n'est envoyée sur
+Internet, sauf si vous activez volontairement l'export FTP vers votre
+propre serveur.</p>
+<h2 id="comment-partager-le-dashboard-avec-mon-médecin">Comment partager
+le Dashboard avec mon médecin ?</h2>
+<p>Utilisez l'export local (Paramètres → Export) pour générer un fichier
+HTML autonome. Ce fichier peut être envoyé par email ou partagé sur une
+clé USB — il s'ouvre dans n'importe quel navigateur sans
+installation.</p>
+<p><em>Hilo — Guide d'utilisation · Document généré
+automatiquement</em></p>
+
+    </main>
+
+  </div>
+
+  <script>
+    // Highlight active section in sidebar on scroll
+    const headings = document.querySelectorAll('h1[id], h2[id]');
+    const links    = document.querySelectorAll('.aide-sidebar a[href^="#"]');
+
+    function updateActive() {
+      let current = '';
+      headings.forEach(h => {
+        if (window.scrollY >= h.offsetTop - 100) current = h.id;
+      });
+      links.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+      });
+    }
+    window.addEventListener('scroll', updateActive, { passive: true });
+    updateActive();
+  </script>
+</body>
+</html>
