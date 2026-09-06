@@ -4,7 +4,7 @@
 
 ---
 
-## V9.0.8 — 13 juillet 2026
+## V9.0.8 — 06 Septembre 2026
 - Fix : rafraîchissement automatique des courbes/stats Sommeil après import OSCAR V2
 - Fix : bouton 💤 "pendant sommeil PPC" masqué si module Sommeil désactivé ou pas de sessions OSCAR en base (F5 requis après changement de module)
 - dashboard_template.py : commentaire ajouté pour documenter la section _B64 (template Dashboard Tension encodé en base64)
