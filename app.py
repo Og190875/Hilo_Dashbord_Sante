@@ -2304,12 +2304,26 @@ def api_oscar_nuit():
                         "valeur": round(sum(vals) / len(vals), 2),
                     })
 
-            # Tension durant la nuit (debut_ts → fin_ts)
+            # Tension durant la nuit (debut_ts → fin_ts) + 1 point avant + 1 point après
             tension_nuit = []
             if sess[2] and sess[3]:
-                from datetime import datetime as _dtn
                 ts_deb = sess[2]
                 ts_fin = sess[3]
+
+                # Point avant la nuit (dernier avant debut_ts)
+                row_avant = conn.execute(
+                    "SELECT strftime('%s', timestamp) AS ts_unix, systolic, diastolic, heartrate "
+                    "FROM mesures_hilo "
+                    "WHERE systolic IS NOT NULL "
+                    "AND CAST(strftime('%s', timestamp) AS INTEGER) < ? "
+                    "ORDER BY timestamp DESC LIMIT 1",
+                    (ts_deb,)
+                ).fetchone()
+                if row_avant:
+                    tension_nuit.append({"ts": int(row_avant[0]), "sys": row_avant[1],
+                                         "dia": row_avant[2], "fc": row_avant[3], "hors_nuit": True})
+
+                # Mesures pendant la session
                 rows_t = conn.execute(
                     "SELECT strftime('%s', timestamp) AS ts_unix, "
                     "systolic, diastolic, heartrate "
@@ -2317,15 +2331,23 @@ def api_oscar_nuit():
                     "WHERE systolic IS NOT NULL "
                     "AND CAST(strftime('%s', timestamp) AS INTEGER) BETWEEN ? AND ? "
                     "ORDER BY timestamp",
-                    (ts_deb - 7200, ts_fin + 7200)
+                    (ts_deb, ts_fin)
                 ).fetchall()
                 for r in rows_t:
-                    tension_nuit.append({
-                        "ts":  int(r[0]),
-                        "sys": r[1],
-                        "dia": r[2],
-                        "fc":  r[3],
-                    })
+                    tension_nuit.append({"ts": int(r[0]), "sys": r[1], "dia": r[2], "fc": r[3]})
+
+                # Point après la nuit (premier après fin_ts)
+                row_apres = conn.execute(
+                    "SELECT strftime('%s', timestamp) AS ts_unix, systolic, diastolic, heartrate "
+                    "FROM mesures_hilo "
+                    "WHERE systolic IS NOT NULL "
+                    "AND CAST(strftime('%s', timestamp) AS INTEGER) > ? "
+                    "ORDER BY timestamp ASC LIMIT 1",
+                    (ts_fin,)
+                ).fetchone()
+                if row_apres:
+                    tension_nuit.append({"ts": int(row_apres[0]), "sys": row_apres[1],
+                                         "dia": row_apres[2], "fc": row_apres[3], "hors_nuit": True})
 
             # Navigation prev/next
             prev_row = conn.execute(

@@ -13,7 +13,7 @@ from pathlib import Path
 # ── Port configurable ─────────────────────────────────────────────────────────
 PORT = 5050
 URL  = f"http://127.0.0.1:{PORT}"
-VERSION = "V9.0.8"
+VERSION = "V9.0.9"
 
 # ── Debug chemin ─────────────────────────────────────────────────────────────
 print(f"[Hilo] Fichier    : {os.path.abspath(__file__)}")

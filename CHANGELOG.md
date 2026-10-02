@@ -4,6 +4,11 @@
 
 ---
 
+## V9.0.9 — (en cours)
+- Graphique Sommeil/Détail nuit — tension limitée à la session PPC (+ 1 point avant/après en repère contextuel), axe X ajusté
+
+---
+
 ## V9.0.8 — 06 Septembre 2026
 - Fix : rafraîchissement automatique des courbes/stats Sommeil après import OSCAR V2
 - Fix : bouton 💤 "pendant sommeil PPC" masqué si module Sommeil désactivé ou pas de sessions OSCAR en base (F5 requis après changement de module)
